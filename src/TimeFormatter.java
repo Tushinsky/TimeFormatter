@@ -1,17 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+import java.util.stream.IntStream;
 
-/**
- *
- * @author Sergii.Tushinskyi
- */
 public class TimeFormatter {
-     /*
-    в минуте 60 секунд, в часе 60*60=3600 секунд, в сутках 24*60*60=86400 секунд,
-    в году 365*24*60*60=31536000 секунд
+
+    /*
+    в минуте 60 секунд, в часе 60*60=3600 секунд, в сутках 24*60*60=86400 секунд, в году 365*24*60*60=31536000 секунд
      */
     public static String formatDuration(int seconds) {
         String result = "";
@@ -19,6 +11,7 @@ public class TimeFormatter {
         if (seconds == 0) {
             return "now";
         }
+        String[] strArray = new String[0];
         int year = seconds / 31536000;// годы
         int time = year * 31536000;
         int day = (seconds - time) / 86400;// дни
@@ -28,45 +21,27 @@ public class TimeFormatter {
         int minute = (seconds - time) / 60;// минуты
         time += minute * 60;
         int second = seconds - time;// секунды
-        String years = getTimeComponent(year, "year");
-        String days = getTimeComponent(day, "day");
-        String hours = getTimeComponent(hour, "hour");
-        String minutes = getTimeComponent(minute, "minute");
-        String sec = getTimeComponent(second, "second");
-        result = result.concat(years);
-        if(!days.equals("")) {
-            if(!result.equals("")) {
-                result = result.concat(", ").concat(days);
-            } else {
-                result = result.concat(days);
+        String years = getTimeComponent(year, "year");// форматируем годы
+        strArray = getStringArray(strArray, years);
+        String days = getTimeComponent(day, "day");// форматируем дни
+        strArray = getStringArray(strArray, days);
+        String hours = getTimeComponent(hour, "hour");// форматируем часы
+        strArray = getStringArray(strArray, hours);
+        String minutes = getTimeComponent(minute, "minute");// форматируем минуты
+        strArray = getStringArray(strArray, minutes);
+        String sec = getTimeComponent(second, "second");// форматируем секунды
+        strArray = getStringArray(strArray, sec);
+        if (strArray.length == 1) {
+            result = strArray[0];
+        } else {
+            for (int i = 0; i < strArray.length - 1; i++) {
+                result = result.concat(strArray[i]).concat(", ");
             }
+            result = result.substring(0, result.length() - 2).concat(" and ").concat(strArray[strArray.length - 1]);
         }
-        if(!hours.equals("")) {
-            if(!result.equals("")) {
-                result = result.concat(", ").concat(hours);
-            } else {
-                result = result.concat(hours);
-            }
-        }
-        if(!minutes.equals("")) {
-            if(!result.equals("")) {
-                result = result.concat(", ").concat(minutes);
-            } else {
-                result = result.concat(minutes);
-            }
-            
-        }
-        if(!sec.equals("")) {
-            if(!result.equals("")) {
-                result = result.concat(" and ").concat(sec);
-            } else {
-                result = result.concat(sec);
-            }
-        }
-        
         return result;
     }
-    
+
     private static String getTimeComponent(int i, String s) {
         if (i == 0) {
             return "";
@@ -77,6 +52,28 @@ public class TimeFormatter {
         } else {
             return i + " " + s;
 
+        }
+    }
+
+    private static String[] getStringArray(String[] array, String item) {
+        String[] retArray;
+        if(array.length == 0) {
+            if (!item.equals("")) {
+                retArray = new String[1];
+                retArray[0] = item;
+                return retArray;
+            } else {
+                return new String[0];
+            }
+        } else {
+            if (!item.equals("")) {
+                retArray = new String[array.length + 1];
+                IntStream.range(0, array.length).forEach(i -> retArray[i] = array[i]);
+                retArray[retArray.length - 1] = item;
+                return retArray;
+            } else {
+                return array;
+            }
         }
     }
 }
